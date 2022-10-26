@@ -38,11 +38,9 @@ public class RunChain
         /*
             --------On Startup-------------
          */
-        List<String> format_1 = List.of("postalAddress", "email", "phone");
-        List<String> format_2 = List.of("email", "phone", "postalAddress");
-        List<String> format_3 = List.of("phone", "email");
 
 
+        // -------- Define Business Logic and register Business Functions with names --------------
         BusinessLogic logic = new BusinessLogic("user@example.com", "10 Herengracht", "00-18987");
 
         Map<String, Function<String, String>> functionMap =
@@ -52,6 +50,14 @@ public class RunChain
                         "postalAddress", logic::appendPostalAddress
                 );
 
+
+        // ---------- Define Formats -----------------
+        List<String> format_1 = List.of("postalAddress", "email", "phone");
+        List<String> format_2 = List.of("email", "phone", "postalAddress");
+        List<String> format_3 = List.of("phone", "email");
+
+
+        // ------------- Create Chains Early -----------------------------
         ChainBuilder<String> stringFunctions = new ChainBuilder<>();
 
         Function<String, String> fmt_1 = stringFunctions.buildChain(format_1, functionMap);

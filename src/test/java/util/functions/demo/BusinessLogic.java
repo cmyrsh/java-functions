@@ -1,4 +1,4 @@
-package nl.ing.demo;
+package util.functions.demo;
 
 public class BusinessLogic {
 

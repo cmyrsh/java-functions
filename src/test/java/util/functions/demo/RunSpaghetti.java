@@ -1,8 +1,9 @@
-package nl.ing.demo;
+package util.functions.demo;
 
 
 
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
@@ -19,12 +20,12 @@ import java.util.stream.IntStream;
  * ---------------------------------------------------------------------------------------------------------------------
  *
  */
-public class RunSpaghettiAsync
+public class RunSpaghetti
 {
 
 
     public static void main(String[] args) {
-        new RunSpaghettiAsync().process(15000);
+        new RunSpaghetti().process(10_000);
     }
 
     public void process(Integer limit)
@@ -32,39 +33,37 @@ public class RunSpaghettiAsync
         /*
             --------On Startup-------------
          */
-        BusinessLogicAsync logic = new BusinessLogicAsync("user@example.com", "10 Herengracht", "00-18987");
+        BusinessLogic logic = new BusinessLogic("user@example.com", "10 Herengracht", "00-18987");
 
         /*
             ------- Runtime Business Logic ----------
          */
 
         final AtomicLong delta = new AtomicLong(0L);
-        IntStream.range(1, limit).mapToObj(i -> "User Name-" + i)
+        String all_results = IntStream.range(1, limit).mapToObj(i -> "User Name-" + i)
                 .map(
                         name -> {
                             delta.set(System.nanoTime());
                             String format = name.substring(name.length() - 1);
 
                             switch (format) {
-                                case "1" : {
-                                    String name_3 = logic.appendPostalAddress(name)
-                                            .thenCompose(logic::appendEmail)
-                                            .thenCompose(logic::appendPhoneNumber).join();
+                                case "1": {
+                                    String name_1 = logic.appendPostalAddress(name);
+                                    String name_2 = logic.appendEmail(name_1);
+                                    String name_3 = logic.appendPhoneNumber(name_2);
                                     delta.set(System.nanoTime() - delta.get());
                                     return name_3;
                                 }
-                                case "2" : {
-
-                                    String name_3 = logic.appendEmail(name)
-                                            .thenCompose(logic::appendPhoneNumber)
-                                            .thenCompose(logic::appendPostalAddress)
-                                                    .join();
+                                case "2": {
+                                    String name_1 = logic.appendEmail(name);
+                                    String name_2 = logic.appendPhoneNumber(name_1);
+                                    String name_3 = logic.appendPostalAddress(name_2);
                                     delta.set(System.nanoTime() - delta.get());
                                     return name_3;
                                 }
-                                case "3" : {
-                                    String name_2 = logic.appendPhoneNumber(name)
-                                                    .thenCompose(logic::appendEmail).join();
+                                case "3": {
+                                    String name_1 = logic.appendPhoneNumber(name);
+                                    String name_2 = logic.appendEmail(name_1);
                                     delta.set(System.nanoTime() - delta.get());
                                     return name_2;
                                 }
@@ -76,7 +75,10 @@ public class RunSpaghettiAsync
 
 
                         }
-                ).filter(name -> name.contains("email")).forEach(name -> System.out.println(" Result : " + name + " -- Delta : " + delta.get()));
+                ).filter(name -> name.contains("email"))
+                .map(name -> name.concat("--").concat(Long.toString(delta.get())))
+                .collect(Collectors.joining("\n"));
+        System.out.println(all_results);
 
     }
 

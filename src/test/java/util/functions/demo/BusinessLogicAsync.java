@@ -1,4 +1,4 @@
-package nl.ing.demo;
+package util.functions.demo;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
